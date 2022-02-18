@@ -1,3 +1,4 @@
+const popup = d3.select('#popup');
 class MapChart {
     constructor(activeColumn, data) {
         this.activeColumn = activeColumn;
@@ -9,6 +10,8 @@ class MapChart {
         this.togglePlay = document.getElementById("toggle-play");
 
         this.togglePlay.onclick = (e) => this.handlePlayToggle(e);
+
+        this.popupInfo();
     }
 
     handlePlayToggle(e) {
@@ -50,10 +53,10 @@ class MapChart {
         
 
         // get the current date data;
-        let dateData = this.data
+        this.dateData = this.data
             .filter(item => item.datum == this.activeDate).filter(item => item.okres_lau_kod)
         
-        dateData.forEach(item => {
+        this.dateData.forEach(item => {
             this.columns.forEach(col => {
                 item[col] = parseFloat(item[col])
             });
@@ -61,24 +64,21 @@ class MapChart {
             return item;
         })
         
-        dateData.sort((a, b) => parseInt(a[this.activeColumn]) - parseInt(b[this.activeColumn]));
+        this.dateData.sort((a, b) => parseInt(a[this.activeColumn]) - parseInt(b[this.activeColumn]));
 
         // get min and max;
-        let count = dateData.length - 1;
+        let count = this.dateData.length - 1;
         // dateData[0][this.activeColumn]
         this.domain = [
             0,
-            dateData[count][this.activeColumn]
+            this.dateData[count][this.activeColumn]
         ];
-
-        console.log(dateData[0][this.activeColumn]);
-        console.log(this.domain);
         
-        // 
+        // update the colors
         this.gPaths.each((p, j, g) => {
 
             let id = g[j].id;
-            let data = dateData.find(item => item.okres_lau_kod == id);
+            let data = this.dateData.find(item => item.okres_lau_kod == id);
 
             let path = d3.select(`#${id} path`)
                     .transition()
@@ -124,6 +124,10 @@ class MapChart {
             if(this.timeInterVal) {
                 clearInterval(this.timeInterVal);
                 this.currentIndex = 0;
+
+                this.activeDate = this.dates[this.currentIndex];
+                this.updateTimeString();
+                this.togglePlay.click();
             }
         });
     }
@@ -171,6 +175,34 @@ class MapChart {
     }
 
     // popup
+    popupInfo() {
+        this.gPaths.each((p, i, g) => {
+            let node = g[i];
+
+            d3.select(node).on('mouseover', (e) => {
+                // console.log("Mouse Over");
+
+                // let id = g[i].id;
+                // let data = this.dateData.find(item => item.okres_lau_kod == id);
+
+                // popup.transition()
+                //     .duration(500)
+                //     .style("opacity", .9);
+
+                // popup.html(`
+                //     <div class='popup-item'><b>Nom</b>${data.okres_lau_kod}</div>
+                //     <div class='popup-item'><b>Value</b>${data[this.activeColumn]}</div>
+                // `)
+                // .style("left", (e.pageX) + "px")
+                // .style("top", (e.pageY - 30) + "px");
+            })
+            .on('mouseout', e => {
+                // console.log('Mouse Out');
+            });
+
+            // console.log(node);
+        });
+    }   
 }
 
 const chartInstance = new MapChart('kumulativni_pocet_nakazenych', []);
