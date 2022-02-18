@@ -134,7 +134,7 @@ class MapChart {
 
     play() {
         this.timeInterVal = setInterval(() => {
-            this.currentIndex += 3;
+            this.currentIndex += 1;
 
             if(this.currentIndex >= this.dates.length) {
                 this.currentIndex = 0;
@@ -182,22 +182,37 @@ class MapChart {
             d3.select(node).on('mouseover', (e) => {
                 // console.log("Mouse Over");
 
-                // let id = g[i].id;
-                // let data = this.dateData.find(item => item.okres_lau_kod == id);
+                let id = g[i].id;
+                let data = this.dateData.find(item => item.okres_lau_kod == id);
 
-                // popup.transition()
-                //     .duration(500)
-                //     .style("opacity", .9);
+                popup.transition()
+                    .duration(500)
+                    .style("opacity", .9);
 
-                // popup.html(`
-                //     <div class='popup-item'><b>Nom</b>${data.okres_lau_kod}</div>
-                //     <div class='popup-item'><b>Value</b>${data[this.activeColumn]}</div>
-                // `)
-                // .style("left", (e.pageX) + "px")
-                // .style("top", (e.pageY - 30) + "px");
+                popup.html(`
+                    <div class='popup-item'><b>Name</b>${data.okres_lau_kod}</div>
+                    <div class='popup-item'><b>${this.activeColumn.split("_").join(" ")}</b>${data[this.activeColumn]}</div>
+                `)
+                .style("left", (e.pageX) + "px")
+                .style("top", (e.pageY - 30) + "px");
+
+                d3.select(`#${id} path`).attr("fill-opacity", 1);
+                d3.select(`#${id} path`).style('stroke', 'green');
+                d3.select(`#${id} path`).attr('stroke-width', 1.5);
             })
             .on('mouseout', e => {
+                let id = g[i].id;
+                popup.transition()
+                    .duration(500)
+                    .style("opacity", 0)
+                    .on('end', function() {
+                        popup.html('');
+                    });
+
                 // console.log('Mouse Out');
+                d3.select(`#${id} path`).attr("fill-opacity", 1);
+                d3.select(`#${id} path`).style('stroke', '#ddd');
+                d3.select(`#${id} path`).attr('stroke-width', 0.5);
             });
 
             // console.log(node);
