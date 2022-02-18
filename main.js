@@ -15,7 +15,7 @@ class MapChart {
         let { target } = e;
 
         console.log(target.innerHTML);
-        
+
         if(target.innerHTML == 'Play') {
             target.innerHTML = 'Pause';
             this.play();
@@ -97,8 +97,11 @@ class MapChart {
 
     // color scheme
     getColor(value) {
-        // let colorScale = d3.scaleSequential().domain([...this.domain]).interpolator(d3.interpolateReds)
-        let colorScale = d3.scaleLinear().domain([...this.domain]).range(['#fa9fb5', '#c51b8a']);
+        // let colorScale = d3.scaleSequential().domain([...this.domain]).interpolator(d3.interpolateReds)['#fa9fb5', '#c51b8a']
+        let colorScale = d3.scaleLinear()
+            .domain( [0, 10000, 20000, 50000, 100000, 200000, 400000]) 
+            .range(['#edf8fb','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#6e016b'])
+
         return colorScale(value)
     }
 
@@ -127,9 +130,9 @@ class MapChart {
 
     play() {
         this.timeInterVal = setInterval(() => {
-            this.currentIndex += 1;
+            this.currentIndex += 3;
 
-            if(this.currentIndex == this.dates.length) {
+            if(this.currentIndex >= this.dates.length) {
                 this.currentIndex = 0;
                 clearInterval(this.timeInterVal)
             }
@@ -141,6 +144,9 @@ class MapChart {
 
             // update timeString
             this.updateTimeString();
+
+            // clear current legend
+            // legendChart(this.domain);
 
         }, 500);
     }
@@ -176,4 +182,68 @@ d3.csv("data.csv")
     chartInstance.updateChart();
 
 
+    legendChart();
 });
+
+function legendChart() {    
+    let legendSvg = d3.select("#legend-svg")
+        .attr('width', 250)
+        .attr('height', 50)
+    
+    // clear current legend
+    legendSvg.selectAll('*').remove();
+
+    console.log("updating legend");
+
+    var gradient = legendSvg.append('defs')
+        .append('linearGradient')
+        .attr('id', 'gradient')
+        .attr('x1', '0%') // bottom
+        .attr('y1', '0%')
+
+        .attr('x2', '100%') // to top
+        .attr('y2', '0%')
+        .attr('spreadMethod', 'pad');
+    
+    // add stops
+    let pcts = [0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000].map(val => val*100 / 4000);
+    console.log(pcts);
+
+    var colourPct  = d3.zip(
+        pcts, 
+        ['#edf8fb','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#6e016b']
+    );
+
+    console.log(colourPct)
+
+    colourPct.forEach(d => {
+        gradient.append('stop')
+                .attr('offset', `${d[0]}%`)
+                .attr('stop-color', d[1])
+                .attr('stop-opacity', 1);
+    });
+
+    legendSvg.append('rect')
+        .attr('x1', 0)
+        .attr('y1', 0)
+        .attr('width', 230)
+        .attr('height', 30)
+        .style('fill', 'url(#gradient)');
+
+    
+     // create a scale and axis for the legend
+     var legendScale = d3.scaleLinear()
+        .domain([0, 4000])
+        .range([0, 220]);
+
+    var legendAxis = d3.axisBottom()
+        .scale(legendScale)
+        .ticks(4)
+        // .tickValues([0, 100, 200, 500, 1000, 2000, 4000])
+        .tickFormat(d3.format("d"));
+
+    legendSvg.append("g")
+        .attr("class", "legend axis")
+        .attr("transform", "translate(4, 30)")
+        .call(legendAxis);
+}
