@@ -7,11 +7,29 @@ class MapChart {
         this.columns = ['kumulativni_pocet_nakazenych', 'kumulativni_pocet_vylecenych', 'kumulativni_pocet_umrti', 'noveNakaz', 'noveVyle', 'aktNak'];
 
         this.gPaths = d3.selectAll('#okresy_p g');
-        this.togglePlay = document.getElementById("toggle-play");
+        // this.togglePlay = document.getElementById("toggle-play");
+        this.inputSlider = document.getElementById("date-slider");
 
-        this.togglePlay.onclick = (e) => this.handlePlayToggle(e);
+        // this.togglePlay.onclick = (e) => this.handlePlayToggle(e);
+        this.inputSlider.oninput = (e) => this.handleDateChange(e);
 
         this.popupInfo();
+    }
+
+    handleDateChange(e) {
+        let { target: { value } } = e;
+        console.log(
+            new Date(parseFloat(value))
+        );
+
+        let date = new Date(parseFloat(value));
+        let dateString = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+
+        console.log(dateString);
+        this.activeDate = dateString;
+
+        this.updateTimeString();
+        this.updateChart();
     }
 
     handlePlayToggle(e) {

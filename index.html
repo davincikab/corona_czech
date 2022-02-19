@@ -87,6 +87,24 @@
             flex-direction: column;  
             margin:5px 0;      
         }
+
+        .range-slider {
+            bottom: 10px;
+            left:10%;
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .date-labels {
+            display: flex;
+            justify-content: space-between;
+        }
+        .range-slider input {
+            width: 80%;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -105,10 +123,27 @@
         </div>
 
         <div class="date-section abs-sections">
-            <button class="btn" id="toggle-play">Play</button>
+            <!-- <button class="btn" id="toggle-play">Play</button> -->
+
             <h6 class="section-title" id="active-date">
                 2020-03-01
             </h6>
+        </div>
+
+        <div class="range-slider abs-sections">
+            <div class="date-labels">
+                <span id="date-end">2020-03-01</span>
+                <span id="date-end">2/4/2022</span>
+            </div>
+            
+            <input 
+                type="range" 
+                name="date" 
+                id="date-slider" 
+                min="1583020800000" 
+                max="1643922000000" 
+                step="86400000"
+            >
         </div>
 
         <?xml version="1.0" encoding="UTF-8" standalone="no"?>
